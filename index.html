@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historia de la Computación</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d0d1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #0d0d1a 0%, #1a1a3e 50%, #0d0d1a 100%);
+      border-bottom: 2px solid #00d4ff;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    header img.banner {
+      max-width: 320px;
+      width: 90%;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(0,212,255,0.4);
+      margin-bottom: 20px;
+    }
+    header h1 {
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      letter-spacing: 2px;
+      color: #00d4ff;
+      text-shadow: 0 0 20px rgba(0,212,255,0.6);
+    }
+    header p {
+      margin-top: 8px;
+      color: #8888aa;
+      font-size: 0.95rem;
+    }
+
+    /* ── GRID ── */
+    main {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: #12122a;
+      border: 1px solid #2a2a5a;
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 30px rgba(0,212,255,0.3);
+      border-color: #00d4ff;
+    }
+    .card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+    .card-label {
+      padding: 12px 14px;
+    }
+    .card-label .year {
+      font-size: 0.72rem;
+      color: #00d4ff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .card-label h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 1.3;
+    }
+
+    /* ── MODAL ── */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #modal-overlay.active { display: flex; }
+
+    #modal {
+      background: #12122a;
+      border: 1px solid #00d4ff;
+      border-radius: 18px;
+      max-width: 820px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 0 60px rgba(0,212,255,0.3);
+      display: flex;
+      flex-direction: column;
+      animation: popIn 0.25s ease;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.88); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+
+    #modal-img {
+      width: 100%;
+      max-height: 380px;
+      object-fit: cover;
+      border-radius: 16px 16px 0 0;
+    }
+
+    #modal-body {
+      padding: 28px 32px 32px;
+    }
+    #modal-year {
+      font-size: 0.78rem;
+      color: #00d4ff;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+    #modal-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 18px;
+    }
+    #modal-text {
+      font-size: 0.97rem;
+      line-height: 1.8;
+      color: #c8c8dd;
+      background: #0d0d1a;
+      border: 1px solid #2a2a5a;
+      border-radius: 10px;
+      padding: 20px;
+      white-space: pre-wrap;
+    }
+
+    #modal-close {
+      position: sticky;
+      top: 12px;
+      float: right;
+      margin: 12px 14px 0 0;
+      background: none;
+      border: 1px solid #555;
+      color: #aaa;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      line-height: 34px;
+      text-align: center;
+    }
+    #modal-close:hover { border-color: #00d4ff; color: #00d4ff; }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #444466;
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 480px) {
+      main { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+      #modal-body { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img class="banner" src="bueno.png" alt="Historia de la Computación">
+  <h1>Historia de la Computación</h1>
+  <p>18 hitos que cambiaron el mundo digital</p>
+</header>
+
+<main id="grid"></main>
+
+<div id="modal-overlay">
+  <div id="modal">
+    <button id="modal-close">✕</button>
+    <img id="modal-img" src="" alt="">
+    <div id="modal-body">
+      <div id="modal-year"></div>
+      <div id="modal-title"></div>
+      <div id="modal-text"></div>
+    </div>
+  </div>
+</div>
+
+<footer>Historia de la Computación &mdash; Proyecto educativo</footer>
+
+<script>
+const items = [
+  {
+    year: "1945",
+    title: "ENIAC",
+    img: "imagenes/tubos vacio.png",
+    text: `El ENIAC (Electronic Numerical Integrator and Computer) fue la primera computadora electrónica de propósito general del mundo, desarrollada entre 1943 y 1945 en la Universidad de Pensilvania por John Mauchly y J. Presper Eckert.
+
+Funcionaba con 17,468 tubos de vacío, 7,200 diodos de cristal y consumía 150 kW de electricidad, suficiente para iluminar una ciudad pequeña. Ocupaba 167 m² y pesaba 27 toneladas.
+
+Su primer uso fue calcular trayectorias balísticas para el ejército de los EE. UU. Podía realizar 5,000 sumas o 357 multiplicaciones por segundo, una velocidad asombrosa para la época.
+
+El ENIAC demostró que las máquinas electrónicas podían resolver problemas matemáticos complejos a una velocidad imposible para los humanos, abriendo la era de la computación moderna.`
+  },
+  {
+    year: "1912 – 1954",
+    title: "Alan Turing",
+    img: "imagenes/turin.png",
+    text: `Alan Mathison Turing fue un matemático, lógico y criptógrafo británico considerado el padre de la informática teórica y la inteligencia artificial.
+
+En 1936 publicó su trabajo sobre la "Máquina de Turing", un modelo abstracto que formalizó los conceptos de algoritmo y computación. Esta máquina hipotética podía simular cualquier cálculo matemático, sentando las bases teóricas de todas las computadoras modernas.
+
+Durante la Segunda Guerra Mundial, Turing trabajó en Bletchley Park descifrando los códigos Enigma de la Alemania Nazi, contribuyendo decisivamente a la victoria aliada. Se estima que su trabajo acortó la guerra entre 2 y 4 años.
+
+En 1950 propuso el "Test de Turing" para determinar si una máquina puede mostrar comportamiento inteligente equivalente al humano. Su legado es tan profundo que el Premio Turing, el mayor honor en informática, lleva su nombre.`
+  },
+  {
+    year: "1815 – 1852",
+    title: "Ada Lovelace",
+    img: "imagenes/programadora.png",
+    text: `Augusta Ada King, Condesa de Lovelace, fue una matemática y escritora británica reconocida como la primera programadora de la historia, un siglo antes de que existieran las computadoras modernas.
+
+Hija del poeta Lord Byron, Ada colaboró con Charles Babbage en su Máquina Analítica, la primera concepción de una computadora de propósito general mecánica. En 1843 tradujo un artículo del italiano Luigi Menabrea sobre la máquina y añadió sus propias notas, que triplicaron la longitud del texto original.
+
+En esas notas describió el primer algoritmo diseñado para ser procesado por una máquina: un método para calcular los números de Bernoulli. También anticipó conceptos revolucionarios como la repetición de instrucciones (loops) y las ramificaciones condicionales.
+
+Ada vislumbró que las máquinas podían ir más allá de los cálculos numéricos para procesar cualquier tipo de información. El lenguaje de programación Ada, usado por la NASA y el Departamento de Defensa de EE. UU., fue nombrado en su honor.`
+  },
+  {
+    year: "1947",
+    title: "Transistor",
+    img: "imagenes/transistor.png",
+    text: `El 23 de diciembre de 1947, los físicos John Bardeen, Walter Brattain y William Shockley de los Laboratorios Bell inventaron el transistor, revolucionando para siempre la electrónica y la informática.
+
+El transistor es un dispositivo semiconductor que puede amplificar o conmutar señales eléctricas. Reemplazó a los grandes, calientes y poco confiables tubos de vacío, siendo miles de veces más pequeño, más rápido, más eficiente y duradero.
+
+Sus inventores recibieron el Premio Nobel de Física en 1956. Este diminuto componente hizo posible la miniaturización de los circuitos electrónicos, llevando directamente a la invención del circuito integrado y, décadas después, al microprocesador.
+
+Hoy en día, un solo chip moderno contiene más de 100 mil millones de transistores. Sin el transistor no existirían las computadoras personales, los teléfonos inteligentes, internet ni ningún dispositivo electrónico moderno. Es posiblemente el invento más importante del siglo XX.`
+  },
+  {
+    year: "1903 – 1957",
+    title: "John von Neumann",
+    img: "imagenes/von.png",
+    text: `John von Neumann fue un matemático húngaro-estadounidense cuya contribución más influyente a la informática fue la arquitectura que lleva su nombre: la Arquitectura von Neumann (1945).
+
+Esta arquitectura propone que los datos y los programas se almacenen en la misma memoria, y que una Unidad Central de Procesamiento (CPU) ejecute instrucciones de forma secuencial. Este concepto parece obvio hoy, pero fue una idea revolucionaria que unificó el diseño de las computadoras.
+
+Prácticamente todas las computadoras actuales, desde supercomputadoras hasta microcontroladores, siguen este modelo fundamental. Von Neumann también contribuyó al desarrollo de la bomba atómica en el Proyecto Manhattan, fundó la teoría de juegos y realizó aportaciones fundamentales a la mecánica cuántica y las matemáticas puras.
+
+Su concepto del "programa almacenado" —la idea de que el software podía modificarse sin recablear el hardware— transformó la computación de una ciencia de máquinas fijas a una ciencia del software.`
+  },
+  {
+    year: "1964",
+    title: "IBM System/360",
+    img: "imagenes/IBM.png",
+    text: `El IBM System/360, lanzado el 7 de abril de 1964, fue una familia de computadoras mainframe que cambió radicalmente la industria informática al introducir el concepto de arquitectura compatible.
+
+Antes del 360, cada modelo de computadora tenía su propia arquitectura incompatible: los programas escritos para una máquina no funcionaban en otra. IBM apostó 5 mil millones de dólares (equivalentes a ~45 mil millones actuales) en un proyecto que ofrecía múltiples modelos con diferentes capacidades pero la misma arquitectura de software.
+
+Esto significaba que las empresas podían comprar un modelo pequeño, crecer y actualizar a uno más grande sin reescribir todo su software. El concepto de "familia de computadoras compatibles" nació aquí.
+
+El IBM 360 fue tan influyente que la arquitectura de su conjunto de instrucciones (ISA) evolucionó hasta el IBM z/Architecture actual, que sigue ejecutando sistemas críticos bancarios y gubernamentales en todo el mundo. Frederick Brooks, quien lideró su desarrollo, documentó las lecciones aprendidas en "The Mythical Man-Month", libro fundamental de ingeniería de software.`
+  },
+  {
+    year: "1971",
+    title: "Intel 4004",
+    img: "imagenes/4004.png",
+    text: `El Intel 4004, lanzado el 15 de noviembre de 1971, fue el primer microprocesador comercial de la historia: un chip que contenía toda la CPU de una computadora en un único circuito integrado.
+
+Diseñado por Federico Faggin, Ted Hoff y Stanley Mazor para Intel, el 4004 fue creado originalmente para una calculadora de la empresa japonesa Busicom. Intel negoció los derechos para venderlo como componente universal.
+
+El chip tenía 2,300 transistores en un proceso de 10 micrómetros, funcionaba a 740 kHz y podía procesar datos de 4 bits. Su poder de cómputo era comparable al ENIAC, pero cabía en la palma de la mano y costaba apenas 200 dólares.
+
+El 4004 inauguró la era de los microprocesadores e hizo posible la computación personal. Sin él, no existirían las PCs, laptops ni smartphones. La Ley de Moore, formulada por el cofundador de Intel Gordon Moore en 1965, predijo que el número de transistores en un chip se duplicaría cada dos años, una predicción que se cumplió fielmente durante décadas.`
+  },
+  {
+    year: "1955 –",
+    title: "Bill Gates",
+    img: "imagenes/bill.png",
+    text: `William Henry Gates III, cofundador de Microsoft, transformó la computación personal al hacer del software un negocio tan importante como el hardware.
+
+En 1975, Gates y Paul Allen fundaron Microsoft con la visión de poner "una computadora en cada escritorio y en cada hogar". Su primer gran éxito fue el intérprete de BASIC para el Altair 8800. El punto de inflexión llegó en 1980 cuando IBM los contrató para proveer un sistema operativo para su nueva PC.
+
+Microsoft adquirió QDOS (Quick and Dirty Operating System), lo adaptó como MS-DOS y, crucialmente, conservó los derechos de licencia para venderlo a otros fabricantes. Esta decisión estratégica convirtió a Microsoft en la empresa de software dominante del mundo.
+
+Windows, Office, Azure y otras plataformas de Microsoft han dado forma a cómo trabajamos, comunicamos y procesamos información. Gates fue el hombre más rico del mundo durante más de una década. Desde 2000, a través de la Fundación Bill y Melinda Gates, ha donado más de 60 mil millones de dólares a causas de salud global y educación.`
+  },
+  {
+    year: "1955 – 2011 / 1950 –",
+    title: "Steve Jobs y Steve Wozniak",
+    img: "imagenes/jobs.png",
+    text: `Steve Jobs y Steve Wozniak cofundaron Apple Computer el 1 de abril de 1976 en el garaje de la familia Jobs en Los Altos, California, cambiando para siempre la relación entre las personas y la tecnología.
+
+Steve Wozniak, el genio técnico, diseñó el Apple I y el Apple II de la nada, creando computadoras revolucionarias con recursos mínimos. El Apple II (1977) fue la primera computadora personal verdaderamente exitosa en el mercado masivo, gracias a su diseño limpio, pantalla a color y la llegada de VisiCalc, la primera hoja de cálculo.
+
+Steve Jobs era el visionario del diseño y los negocios. Comprendió que las computadoras debían ser hermosas, intuitivas y accesibles para personas sin conocimientos técnicos. Tras visitar el PARC de Xerox, impulsó el desarrollo del Lisa y luego el Macintosh con interfaz gráfica y ratón.
+
+Tras ser expulsado de Apple en 1985, Jobs fundó NeXT y adquirió Pixar (que produjo Toy Story). Al regresar a Apple en 1997, orquestó uno de los retornos más épicos en la historia empresarial, lanzando el iMac, iPod, iTunes, iPhone y iPad, productos que redefinieron industrias enteras.`
+  },
+  {
+    year: "1984",
+    title: "Macintosh 128K",
+    img: "imagenes/steve.png",
+    text: `El Apple Macintosh 128K, presentado el 24 de enero de 1984 durante el Super Bowl con el legendario anuncio dirigido por Ridley Scott, fue la primera computadora personal de éxito comercial con interfaz gráfica de usuario (GUI) y ratón.
+
+Con un precio de 2,495 dólares, el Mac venía en una caja compacta all-in-one con pantalla de 9 pulgadas integrada. Su sistema operativo presentaba ventanas, íconos, menús desplegables y un cursor controlado por ratón, haciendo la computación accesible para personas sin conocimientos técnicos.
+
+Antes del Mac, las computadoras se controlaban escribiendo comandos de texto. La GUI democratizó la tecnología: ya no era necesario memorizar comandos crípticos. Software como MacWrite y MacPaint mostraron el potencial del "what you see is what you get" (WYSIWYG).
+
+El Macintosh estableció los estándares de diseño que Microsoft copió en Windows y que definen las interfaces de usuario hasta hoy. Su eslogan del anuncio —"1984 no será como 1984"— se convirtió en una declaración cultural sobre la tecnología como herramienta de liberación.`
+  },
+  {
+    year: "1955 –",
+    title: "Tim Berners-Lee",
+    img: "imagenes/www.png",
+    text: `Sir Timothy John Berners-Lee, científico de la computación británico, inventó la World Wide Web en 1989 mientras trabajaba en el CERN (Organización Europea para la Investigación Nuclear) en Ginebra, Suiza.
+
+Berners-Lee propuso un sistema de gestión de información distribuida para que los investigadores del CERN pudieran compartir datos fácilmente. El sistema que desarrolló integraba tres tecnologías fundamentales: HTML (HyperText Markup Language) para crear páginas, HTTP (HyperText Transfer Protocol) para transmitirlas y las URLs para localizarlas.
+
+El primer sitio web de la historia se publicó el 6 de agosto de 1991 en info.cern.ch. Berners-Lee tomó la decisión crucial de no patentar su invención y ponerla a disposición del mundo de forma gratuita. Esta generosidad transformó la Web de un proyecto científico en la plataforma global que conecta a miles de millones de personas.
+
+En 1994 fundó el W3C (World Wide Web Consortium) para desarrollar estándares abiertos para la Web. Hoy aboga por una "Web para todos", libre de la vigilancia masiva y la centralización del poder en grandes corporaciones.`
+  },
+  {
+    year: "1969 –",
+    title: "Linus Torvalds",
+    img: "imagenes/Linux.png",
+    text: `Linus Benedict Torvalds, programador finlandés-estadounidense, creó el kernel Linux en 1991 siendo un estudiante de 21 años en la Universidad de Helsinki. Con este acto desencadenó la revolución del software de código abierto.
+
+El 25 de agosto de 1991, Torvalds publicó en un foro de internet: "Estoy haciendo un sistema operativo (libre), solo un hobby, no será grande ni profesional como GNU". Esa publicación cambió el mundo. En pocos meses, programadores de todo el mundo comenzaron a contribuir al proyecto.
+
+Linux se convirtió en el sistema operativo dominante en servidores, supercomputadoras, dispositivos embebidos e infraestructura de internet. El 96% de los servidores web del mundo corren Linux. Android, que tiene más de 3 mil millones de usuarios, está basado en el kernel Linux. La mayoría de las supercomputadoras más potentes del mundo usan Linux.
+
+Torvalds también creó Git en 2005, el sistema de control de versiones más usado en el mundo. Su filosofía de desarrollo colaborativo y abierto transformó no solo la tecnología, sino la forma en que la humanidad crea software.`
+  },
+  {
+    year: "2007",
+    title: "iPhone",
+    img: "imagenes/iphone.png",
+    text: `El 9 de enero de 2007, Steve Jobs subió al escenario de la Macworld Conference y anunció: "Hoy Apple va a reinventar el teléfono." Lo que presentó fue el iPhone original, un dispositivo que fusionaba un iPod, un teléfono y un comunicador de internet en uno solo.
+
+El iPhone eliminó el teclado físico y lo reemplazó con una pantalla táctil multigestos, introduciendo conceptos como pellizcar para hacer zoom, deslizar para desbloquear y tocar para navegar. La experiencia era tan intuitiva que los usuarios podían aprender a usarlo sin manual.
+
+En un año, el iPhone transformó completamente la industria de los teléfonos móviles. Los gigantes Nokia y BlackBerry, que dominaban el mercado, colapsaron en pocos años. Apple creó el App Store en 2008, dando origen a un ecosistema de millones de aplicaciones y una nueva economía digital.
+
+El smartphone moderno, que hoy usan más de 4 mil millones de personas, existe en su forma actual gracias al iPhone. Redefinió la fotografía, los mapas, la música, los videojuegos, las redes sociales y prácticamente todos los aspectos de la vida cotidiana moderna.`
+  },
+  {
+    year: "2004 – 2005",
+    title: "Redes Sociales",
+    img: "imagenes/redes sociales.png",
+    text: `Aunque las redes sociales tienen precursores como SixDegrees (1997) y MySpace (2003), el año 2004 marcó un punto de inflexión con el lanzamiento de Facebook por Mark Zuckerberg desde su dormitorio en Harvard, y 2005 con YouTube.
+
+Facebook comenzó exclusivamente para estudiantes universitarios y se expandió al público general en 2006. Su modelo de conectar personas reales con sus identidades reales, compartir actualizaciones de vida y mantener redes de amigos estableció el paradigma de las redes sociales modernas.
+
+YouTube (2005) democratizó la producción y distribución de video: cualquier persona con una cámara podía publicar contenido para el mundo. Google lo adquirió en 2006 por 1,650 millones de dólares, una de las mejores inversiones tecnológicas de la historia.
+
+Twitter (2006), Instagram (2010) y TikTok (2016) siguieron redefiniendo cómo nos comunicamos. Las redes sociales han cambiado la política, el periodismo, el entretenimiento y las relaciones humanas. Han dado voz a movimientos sociales globales, pero también han generado debates profundos sobre privacidad, desinformación y salud mental.`
+  },
+  {
+    year: "2006",
+    title: "Cómputo en la Nube",
+    img: "imagenes/nube.png",
+    text: `El cómputo en la nube (cloud computing) se popularizó como concepto comercial en 2006 cuando Amazon lanzó Amazon Web Services (AWS), ofreciendo infraestructura de servidores como servicio bajo demanda a través de internet.
+
+La idea central es simple pero poderosa: en lugar de comprar y mantener costosos servidores propios, las empresas y personas pueden alquilar capacidad de cómputo, almacenamiento y software por uso. Solo pagas por lo que consumes, como la electricidad.
+
+AWS fue seguido por Google Cloud (2008) y Microsoft Azure (2010), creando un mercado que hoy vale más de 600 mil millones de dólares anuales. La nube hizo posible que startups con pocos recursos compitieran con grandes corporaciones, ya que podían escalar su infraestructura instantáneamente según la demanda.
+
+Servicios cotidianos como Netflix, Spotify, Uber, WhatsApp y prácticamente toda aplicación moderna funcionan sobre infraestructura en la nube. Durante la pandemia de COVID-19, la nube fue infraestructura crítica que permitió el trabajo remoto masivo. El cómputo en la nube es hoy tan esencial como la electricidad o el agua para la economía digital.`
+  },
+  {
+    year: "2016 – 2017",
+    title: "NVIDIA y las GPU",
+    img: "imagenes/nvidia.png",
+    text: `NVIDIA, fundada en 1993 por Jensen Huang, Chris Malachowsky y Curtis Priem, fue originalmente una empresa de tarjetas gráficas para videojuegos. En la década de 2010 sus GPUs se convirtieron en el motor de la revolución de la inteligencia artificial.
+
+Las GPUs (Unidades de Procesamiento Gráfico) fueron diseñadas para renderizar gráficos 3D, procesando miles de operaciones matemáticas simples en paralelo. Los investigadores de IA descubrieron que esta arquitectura paralela era perfecta para entrenar redes neuronales, que requieren millones de multiplicaciones matriciales simultáneas.
+
+El lanzamiento de la arquitectura Pascal (2016) y Volta (2017) con las tarjetas Tesla V100 convirtió a NVIDIA en la empresa indispensable para el desarrollo de IA. El chip A100 (2020) y el H100 (2022) se convirtieron en el "oro digital" de la era de la inteligencia artificial.
+
+Con la explosión de ChatGPT y los modelos de lenguaje grande en 2022-2023, la demanda de GPUs NVIDIA se disparó. La empresa superó una valoración de 1 billón de dólares en 2023 y se convirtió brevemente en la empresa más valiosa del mundo en 2024, con Jensen Huang siendo reconocido como la figura central de la revolución de la IA.`
+  },
+  {
+    year: "2012",
+    title: "Deep Learning",
+    img: "imagenes/ia.png",
+    text: `El año 2012 marcó el inicio de la era del Deep Learning moderno cuando AlexNet, una red neuronal profunda desarrollada por Alex Krizhevsky, Ilya Sutskever y Geoffrey Hinton, ganó el concurso ImageNet con un margen de error sin precedentes.
+
+Las redes neuronales artificiales existen desde los años 50, pero el "invierno de la IA" las mantuvo relegadas durante décadas. El Deep Learning resurgió gracias a tres factores convergentes: algoritmos mejorados, datos masivos de internet y el poder de cómputo paralelo de las GPUs de NVIDIA.
+
+AlexNet redujo la tasa de error en reconocimiento de imágenes del 26% al 15.3%, una mejora tan dramática que convenció a la comunidad científica de que las redes neuronales profundas eran el camino correcto. En pocos años, el Deep Learning superó al rendimiento humano en reconocimiento de imágenes, voz y texto.
+
+Esta revolución produjo Google Translate mejorado, asistentes de voz (Siri, Alexa), coches autónomos, diagnóstico médico por imagen y, eventualmente, modelos de lenguaje grande como GPT y Claude. Geoffrey Hinton, Yann LeCun y Yoshua Bengio, los "padrinos del Deep Learning", recibieron el Premio Turing en 2018.`
+  },
+  {
+    year: "2019",
+    title: "Computación Cuántica",
+    img: "imagenes/qubit.png",
+    text: `En octubre de 2019, Google anunció haber logrado la "supremacía cuántica": su procesador cuántico Sycamore de 53 qubits completó en 200 segundos un cálculo que, según estimaron, tomaría 10,000 años a la supercomputadora clásica más poderosa del momento.
+
+La computación cuántica aprovecha los principios de la mecánica cuántica —superposición y entrelazamiento— para procesar información de formas radicalmente diferentes a las computadoras clásicas. Un qubit cuántico puede existir en múltiples estados simultáneamente (no solo 0 o 1), permitiendo explorar millones de posibilidades en paralelo.
+
+Las aplicaciones potenciales son transformadoras: descubrimiento de medicamentos (simulando moléculas complejas), criptografía (rompiendo y creando nuevos sistemas de cifrado), optimización logística, modelado climático y aceleración del Machine Learning.
+
+Empresas como IBM, Google, Microsoft, IonQ y startups especializadas compiten en esta carrera. En 2023, IBM presentó el chip Condor de 1,121 qubits. Sin embargo, los desafíos son enormes: los qubits son extremadamente frágiles y los errores cuánticos siguen siendo el principal obstáculo. Los expertos estiman que las computadoras cuánticas prácticas y generalizadas podrían llegar entre 2030 y 2040.`
+  }
+];
+
+const grid = document.getElementById('grid');
+const overlay = document.getElementById('modal-overlay');
+const modalImg = document.getElementById('modal-img');
+const modalYear = document.getElementById('modal-year');
+const modalTitle = document.getElementById('modal-title');
+const modalText = document.getElementById('modal-text');
+const btnClose = document.getElementById('modal-close');
+
+items.forEach(item => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <img src="${item.img}" alt="${item.title}" loading="lazy">
+    <div class="card-label">
+      <div class="year">${item.year}</div>
+      <h2>${item.title}</h2>
+    </div>
+  `;
+  card.addEventListener('click', () => openModal(item));
+  grid.appendChild(card);
+});
+
+function openModal(item) {
+  modalImg.src = item.img;
+  modalImg.alt = item.title;
+  modalYear.textContent = item.year;
+  modalTitle.textContent = item.title;
+  modalText.textContent = item.text;
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+btnClose.addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
