@@ -34,6 +34,30 @@
       letter-spacing: 1px;
     }
 
+    /* ── FILTROS ── */
+    .filter-bar {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      padding: 28px 20px 0;
+    }
+    .filter-btn {
+      padding: 8px 22px;
+      border-radius: 999px;
+      border: 1px solid #2a2a5a;
+      background: transparent;
+      color: #8888aa;
+      font-size: 0.85rem;
+      font-family: inherit;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover { border-color: #00d4ff; color: #00d4ff; }
+    .filter-btn.active-all  { background: #00d4ff22; border-color: #00d4ff; color: #00d4ff; }
+    .filter-btn.active-persona { background: #f59e0b22; border-color: #f59e0b; color: #f59e0b; }
+    .filter-btn.active-suceso  { background: #7b5ea722; border-color: #a78bfa; color: #a78bfa; }
+
     /* ── SECCIONES ── */
     .page {
       max-width: 1100px;
@@ -42,6 +66,7 @@
     }
 
     .section { margin-top: 64px; }
+    .section.hidden { display: none; }
 
     .section-header {
       display: flex;
@@ -87,7 +112,6 @@
       justify-content: space-between;
       align-items: flex-start;
     }
-
     .timeline::before {
       content: '';
       position: absolute;
@@ -107,6 +131,35 @@
       position: relative;
       cursor: pointer;
       padding: 0 8px;
+      transition: opacity 0.25s;
+    }
+    .tl-item.dimmed {
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    /* badge persona / suceso */
+    .tl-badge {
+      position: absolute;
+      top: 0;
+      right: calc(50% - 88px);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      z-index: 2;
+      text-transform: uppercase;
+    }
+    .tl-badge.persona {
+      background: #f59e0b22;
+      border: 1px solid #f59e0b;
+      color: #f59e0b;
+    }
+    .tl-badge.suceso {
+      background: #7b5ea722;
+      border: 1px solid #a78bfa;
+      color: #a78bfa;
     }
 
     .tl-img-wrap {
@@ -273,6 +326,7 @@
       }
       .tl-item { width: 100%; max-width: 240px; }
       .section-era { display: none; }
+      .tl-badge { right: calc(50% - 80px); }
     }
   </style>
 </head>
@@ -280,8 +334,14 @@
 
 <header>
   <h1>Historia de la Computación</h1>
-  <p>Hechos que cambiaron el mundo digital</p>
+  <p>18 hitos que cambiaron el mundo digital</p>
 </header>
+
+<div class="filter-bar">
+  <button class="filter-btn active-all" data-filter="all">Todos</button>
+  <button class="filter-btn" data-filter="persona">Personas</button>
+  <button class="filter-btn" data-filter="suceso">Sucesos</button>
+</div>
 
 <div class="page" id="page"></div>
 
@@ -297,7 +357,7 @@
   </div>
 </div>
 
-<footer>Historia de la Computación &mdash; Proyecto educativo</footer>
+<footer>Historia de la Computación &mdash; Vigia cientifico</footer>
 
 <script>
 const sections = [
@@ -309,6 +369,7 @@ const sections = [
       {
         year: "1815 – 1852",
         title: "Ada Lovelace",
+        type: "persona",
         img: "imagenes/programadora.png",
         text: `Augusta Ada King, Condesa de Lovelace, fue una matemática y escritora británica reconocida como la primera programadora de la historia, un siglo antes de que existieran las computadoras modernas.
 
@@ -321,6 +382,7 @@ Ada vislumbró que las máquinas podían ir más allá de los cálculos numéric
       {
         year: "1912 – 1954",
         title: "Alan Turing",
+        type: "persona",
         img: "imagenes/turin.png",
         text: `Alan Mathison Turing fue un matemático, lógico y criptógrafo británico considerado el padre de la informática teórica y la inteligencia artificial.
 
@@ -333,6 +395,7 @@ En 1950 propuso el "Test de Turing" para determinar si una máquina puede mostra
       {
         year: "1945",
         title: "ENIAC",
+        type: "suceso",
         img: "imagenes/tubos vacio.png",
         text: `El ENIAC (Electronic Numerical Integrator and Computer) fue la primera computadora electrónica de propósito general del mundo, desarrollada entre 1943 y 1945 en la Universidad de Pensilvania por John Mauchly y J. Presper Eckert.
 
@@ -352,6 +415,7 @@ El ENIAC demostró que las máquinas electrónicas podían resolver problemas ma
       {
         year: "1947",
         title: "Transistor",
+        type: "suceso",
         img: "imagenes/transistor.png",
         text: `El 23 de diciembre de 1947, los físicos John Bardeen, Walter Brattain y William Shockley de los Laboratorios Bell inventaron el transistor, revolucionando para siempre la electrónica y la informática.
 
@@ -364,6 +428,7 @@ Hoy en día, un solo chip moderno contiene más de 100 mil millones de transisto
       {
         year: "1903 – 1957",
         title: "Von Neumann",
+        type: "persona",
         img: "imagenes/von.png",
         text: `John von Neumann fue un matemático húngaro-estadounidense cuya contribución más influyente a la informática fue la arquitectura que lleva su nombre: la Arquitectura von Neumann (1945).
 
@@ -376,6 +441,7 @@ Su concepto del "programa almacenado" transformó la computación de una ciencia
       {
         year: "1964",
         title: "IBM System/360",
+        type: "suceso",
         img: "imagenes/IBM.png",
         text: `El IBM System/360, lanzado el 7 de abril de 1964, fue una familia de computadoras mainframe que cambió radicalmente la industria informática al introducir el concepto de arquitectura compatible.
 
@@ -395,6 +461,7 @@ El IBM 360 fue tan influyente que su arquitectura evolucionó hasta el IBM z/Arc
       {
         year: "1971",
         title: "Intel 4004",
+        type: "suceso",
         img: "imagenes/4004.png",
         text: `El Intel 4004, lanzado el 15 de noviembre de 1971, fue el primer microprocesador comercial de la historia: un chip que contenía toda la CPU de una computadora en un único circuito integrado.
 
@@ -407,6 +474,7 @@ El 4004 inauguró la era de los microprocesadores e hizo posible la computación
       {
         year: "1955 –",
         title: "Bill Gates",
+        type: "persona",
         img: "imagenes/bill.png",
         text: `William Henry Gates III, cofundador de Microsoft, transformó la computación personal al hacer del software un negocio tan importante como el hardware.
 
@@ -419,6 +487,7 @@ Windows, Office y Azure han dado forma a cómo trabajamos. Gates fue el hombre m
       {
         year: "1976",
         title: "Jobs & Wozniak",
+        type: "persona",
         img: "imagenes/jobs.png",
         text: `Steve Jobs y Steve Wozniak cofundaron Apple Computer el 1 de abril de 1976 en el garaje de la familia Jobs en Los Altos, California, cambiando para siempre la relación entre las personas y la tecnología.
 
@@ -438,6 +507,7 @@ Tras ser expulsado de Apple en 1985, Jobs fundó NeXT y adquirió Pixar. Al regr
       {
         year: "1984",
         title: "Macintosh 128K",
+        type: "suceso",
         img: "imagenes/steve.png",
         text: `El Apple Macintosh 128K, presentado el 24 de enero de 1984 durante el Super Bowl con el legendario anuncio dirigido por Ridley Scott, fue la primera computadora personal de éxito comercial con interfaz gráfica de usuario (GUI) y ratón.
 
@@ -450,6 +520,7 @@ El Macintosh estableció los estándares de diseño que Microsoft copió en Wind
       {
         year: "1989 – 1991",
         title: "Tim Berners-Lee",
+        type: "persona",
         img: "imagenes/www.png",
         text: `Sir Timothy John Berners-Lee, científico de la computación británico, inventó la World Wide Web en 1989 mientras trabajaba en el CERN en Ginebra, Suiza.
 
@@ -462,6 +533,7 @@ En 1994 fundó el W3C para desarrollar estándares abiertos. Hoy aboga por una "
       {
         year: "1991",
         title: "Linus Torvalds",
+        type: "persona",
         img: "imagenes/Linux.png",
         text: `Linus Benedict Torvalds, programador finlandés-estadounidense, creó el kernel Linux en 1991 siendo un estudiante de 21 años en la Universidad de Helsinki, desencadenando la revolución del software de código abierto.
 
@@ -481,6 +553,7 @@ Torvalds también creó Git en 2005, el sistema de control de versiones más usa
       {
         year: "2004 – 2005",
         title: "Redes Sociales",
+        type: "suceso",
         img: "imagenes/redes sociales.png",
         text: `Aunque las redes sociales tienen precursores como SixDegrees (1997) y MySpace (2003), el año 2004 marcó un punto de inflexión con el lanzamiento de Facebook por Mark Zuckerberg desde su dormitorio en Harvard, y 2005 con YouTube.
 
@@ -493,6 +566,7 @@ Twitter, Instagram y TikTok siguieron redefiniendo cómo nos comunicamos. Las re
       {
         year: "2006",
         title: "Cómputo en la Nube",
+        type: "suceso",
         img: "imagenes/nube.png",
         text: `El cómputo en la nube se popularizó en 2006 cuando Amazon lanzó Amazon Web Services (AWS), ofreciendo infraestructura de servidores como servicio bajo demanda a través de internet.
 
@@ -505,6 +579,7 @@ Durante la pandemia de COVID-19, la nube fue infraestructura crítica para el tr
       {
         year: "2007",
         title: "iPhone",
+        type: "suceso",
         img: "imagenes/iphone.png",
         text: `El 9 de enero de 2007, Steve Jobs anunció: "Hoy Apple va a reinventar el teléfono." El iPhone fusionaba un iPod, un teléfono y un comunicador de internet en un solo dispositivo.
 
@@ -524,6 +599,7 @@ El smartphone moderno, que hoy usan más de 4 mil millones de personas, existe e
       {
         year: "2012",
         title: "Deep Learning",
+        type: "suceso",
         img: "imagenes/ia.png",
         text: `El año 2012 marcó el inicio de la era del Deep Learning moderno cuando AlexNet, una red neuronal profunda de Alex Krizhevsky, Ilya Sutskever y Geoffrey Hinton, ganó el concurso ImageNet con un margen de error sin precedentes.
 
@@ -536,6 +612,7 @@ Esta revolución produjo Google Translate, asistentes de voz, coches autónomos 
       {
         year: "2016 – 2017",
         title: "NVIDIA y las GPU",
+        type: "suceso",
         img: "imagenes/nvidia.png",
         text: `NVIDIA, fundada en 1993 por Jensen Huang, fue originalmente una empresa de tarjetas gráficas para videojuegos. En la década de 2010 sus GPUs se convirtieron en el motor de la revolución de la inteligencia artificial.
 
@@ -548,6 +625,7 @@ Con la explosión de ChatGPT en 2022-2023, NVIDIA superó 1 billón de dólares 
       {
         year: "2019",
         title: "Computación Cuántica",
+        type: "suceso",
         img: "imagenes/qubit.png",
         text: `En octubre de 2019, Google anunció la "supremacía cuántica": su procesador Sycamore de 53 qubits completó en 200 segundos un cálculo que tomaría 10,000 años a la supercomputadora clásica más poderosa.
 
@@ -561,11 +639,14 @@ En 2023, IBM presentó el chip Condor de 1,121 qubits. Los expertos estiman que 
   }
 ];
 
+/* ── RENDER ── */
 const page = document.getElementById('page');
+const allNodes = [];
 
 sections.forEach((sec, si) => {
   const section = document.createElement('div');
   section.className = 'section';
+  section.dataset.section = si;
   section.innerHTML = `
     <div class="section-header">
       <div class="section-number">${sec.number}</div>
@@ -580,6 +661,7 @@ sections.forEach((sec, si) => {
   if (si < sections.length - 1) {
     const div = document.createElement('div');
     div.className = 'section-divider';
+    div.dataset.divider = si;
     page.appendChild(div);
   }
 
@@ -587,7 +669,10 @@ sections.forEach((sec, si) => {
   sec.items.forEach(item => {
     const node = document.createElement('div');
     node.className = 'tl-item';
+    node.dataset.type = item.type;
+    node.dataset.section = si;
     node.innerHTML = `
+      <span class="tl-badge ${item.type}">${item.type === 'persona' ? 'Persona' : 'Suceso'}</span>
       <div class="tl-img-wrap">
         <img src="${item.img}" alt="${item.title}" loading="lazy">
       </div>
@@ -597,9 +682,37 @@ sections.forEach((sec, si) => {
     `;
     node.addEventListener('click', () => openModal(item));
     tl.appendChild(node);
+    allNodes.push(node);
   });
 });
 
+/* ── FILTROS ── */
+let activeFilter = 'all';
+const filterBtns = document.querySelectorAll('.filter-btn');
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeFilter = btn.dataset.filter;
+
+    filterBtns.forEach(b => b.className = 'filter-btn');
+    btn.classList.add(`active-${activeFilter}`);
+
+    allNodes.forEach(node => {
+      const match = activeFilter === 'all' || node.dataset.type === activeFilter;
+      node.classList.toggle('dimmed', !match);
+    });
+
+    document.querySelectorAll('.section').forEach((sec, si) => {
+      const visible = activeFilter === 'all' ||
+        sections[si].items.some(it => it.type === activeFilter);
+      sec.classList.toggle('hidden', !visible);
+      const divider = document.querySelector(`[data-divider="${si}"]`);
+      if (divider) divider.classList.toggle('hidden', !visible);
+    });
+  });
+});
+
+/* ── MODAL ── */
 const overlay    = document.getElementById('modal-overlay');
 const modalImg   = document.getElementById('modal-img');
 const modalYear  = document.getElementById('modal-year');
