@@ -138,30 +138,6 @@
       pointer-events: none;
     }
 
-    /* badge persona / suceso */
-    .tl-badge {
-      position: absolute;
-      top: 0;
-      right: calc(50% - 88px);
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.8px;
-      padding: 3px 9px;
-      border-radius: 999px;
-      z-index: 2;
-      text-transform: uppercase;
-    }
-    .tl-badge.persona {
-      background: #f59e0b22;
-      border: 1px solid #f59e0b;
-      color: #f59e0b;
-    }
-    .tl-badge.suceso {
-      background: #7b5ea722;
-      border: 1px solid #a78bfa;
-      color: #a78bfa;
-    }
-
     .tl-img-wrap {
       width: 160px;
       height: 160px;
@@ -172,6 +148,14 @@
       z-index: 1;
       transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
       background: #12122a;
+    }
+    .tl-item[data-type="persona"] .tl-img-wrap {
+      border-color: #f59e0b;
+      box-shadow: 0 0 10px rgba(245,158,11,0.3);
+    }
+    .tl-item[data-type="suceso"] .tl-img-wrap {
+      border-color: #a78bfa;
+      box-shadow: 0 0 10px rgba(167,139,250,0.3);
     }
     .tl-item:hover .tl-img-wrap {
       border-color: #00d4ff;
@@ -326,7 +310,6 @@
       }
       .tl-item { width: 100%; max-width: 240px; }
       .section-era { display: none; }
-      .tl-badge { right: calc(50% - 80px); }
     }
   </style>
 </head>
@@ -508,7 +491,7 @@ Tras ser expulsado de Apple en 1985, Jobs fundó NeXT y adquirió Pixar. Al regr
         year: "1984",
         title: "Macintosh 128K",
         type: "suceso",
-        img: "imagenes/steve.png",
+        img: "imagenes/interfaz.png",
         text: `El Apple Macintosh 128K, presentado el 24 de enero de 1984 durante el Super Bowl con el legendario anuncio dirigido por Ridley Scott, fue la primera computadora personal de éxito comercial con interfaz gráfica de usuario (GUI) y ratón.
 
 Con un precio de 2,495 dólares, el Mac venía en una caja compacta all-in-one con pantalla de 9 pulgadas integrada. Su sistema operativo presentaba ventanas, íconos, menús desplegables y un cursor controlado por ratón.
@@ -672,7 +655,6 @@ sections.forEach((sec, si) => {
     node.dataset.type = item.type;
     node.dataset.section = si;
     node.innerHTML = `
-      <span class="tl-badge ${item.type}">${item.type === 'persona' ? 'Persona' : 'Suceso'}</span>
       <div class="tl-img-wrap">
         <img src="${item.img}" alt="${item.title}" loading="lazy">
       </div>
